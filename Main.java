@@ -8,42 +8,43 @@ public class Main {
 	public static void main(String[] args) {
 		System.out.println("start");
 		long end, start = System.currentTimeMillis();
-		BigDecimal calculation = calculate(8);
+		BigDecimal calculation = calculate(100000);
 		end = System.currentTimeMillis();
 		System.out.println();
 		System.out.println("Execution time: " + ((end - start) / 1000.0) + " seconds");
-		System.out.println(calculation);
 		check(calculation);
+		System.out.println();
 	}
 	
 	public static BigDecimal calculate(int iterations) {
+		final BigDecimal ONE = new BigDecimal(1);
 		BigDecimal numerator = new BigDecimal(2),
-				denominator = new BigDecimal(1),
-				factorial = new BigDecimal(1),
-				lcm = new BigDecimal(1);
+				denominator = ONE,
+				bdi;
+		
 		
 		for (int i = 2; i <= iterations; i++) {
-			System.out.println("i: " + i);
-			factorial = factorial.multiply(new BigDecimal(i));
-			lcm = cascadingLCM(denominator, factorial, lcm);
-			numerator = lcm.divide(denominator).multiply(numerator).add(lcm.divide(factorial));
-			denominator = lcm;
+			bdi = new BigDecimal(i);
+			numerator = bdi.multiply(numerator).add(ONE);
+			denominator = denominator.multiply(bdi);
 		}
 		
-		return numerator.divide(denominator, iterations - 1, RoundingMode.FLOOR);
-	}
-	
-	public static BigDecimal cascadingLCM(BigDecimal n1, BigDecimal n2, BigDecimal oldLCM) {
-	    System.out.println("gcd: " + oldLCM);
-	    
-	    BigDecimal lcm = n1.multiply(n2).divide(oldLCM);
-	    System.out.println("lcm: " + lcm);
-	    System.out.println();
-	    return lcm;
+		/*int scale;
+		
+		if (iterations < 15) {
+			scale = iterations - 3;
+		}
+		else {
+			scale = (int) (-0.00000452 * Math.pow(iterations, 3.0) + 0.00376 * Math.pow(iterations, 2.0) + 1.36 * iterations - 8.5) - 1;
+		}*/
+		
+		return numerator.divide(denominator, 2000000, RoundingMode.FLOOR);
 	}
 	
 	public static void check(BigDecimal calculation) {
 		try {
+			System.out.println(calculation);
+			
 			BufferedReader reader = new BufferedReader(new FileReader("digits.txt"));
 			
 			String fromFile = reader.readLine();
