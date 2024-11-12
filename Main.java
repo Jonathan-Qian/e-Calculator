@@ -1,9 +1,8 @@
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
-import java.io.FileReader;
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class Main {
 	public static void main(String[] args) {
@@ -20,12 +19,13 @@ public class Main {
 	public static BigDecimal calculate(int iterations) {
 		BigDecimal numerator = new BigDecimal(2),
 				denominator = new BigDecimal(1),
-				factorial, lcm;
+				factorial = new BigDecimal(1),
+				lcm = new BigDecimal(1);
 		
 		for (int i = 2; i <= iterations; i++) {
-			System.out.println(i);
-			factorial = factorial(i);
-			lcm = lcm(denominator, factorial);
+			System.out.println("i: " + i);
+			factorial = factorial.multiply(new BigDecimal(i));
+			lcm = cascadingLCM(denominator, factorial, lcm);
 			numerator = lcm.divide(denominator).multiply(numerator).add(lcm.divide(factorial));
 			denominator = lcm;
 		}
@@ -33,30 +33,11 @@ public class Main {
 		return numerator.divide(denominator, iterations - 1, RoundingMode.FLOOR);
 	}
 	
-	public static BigDecimal factorial(int n) {
-		BigDecimal product = new BigDecimal(n);
-		
-		for (int i = n - 1; i > 1; i--) {
-			product = product.multiply(new BigDecimal(i));
-		}
-		
-		return product;
-	}
-	
-	public static BigDecimal lcm(BigDecimal n1, BigDecimal n2) {
-		BigDecimal gcd = new BigDecimal(1);
-		final BigDecimal ZERO = new BigDecimal(0);
-		final BigDecimal ONE = new BigDecimal(1);
-
-	    for(BigDecimal i = new BigDecimal(1); i.compareTo(n1) < 1 && i.compareTo(n2) < 1; i = i.add(ONE)) {
-	      if(n1.remainder(i).equals(ZERO) && n2.remainder(i).equals(ZERO))
-	        gcd = i;
-	    }
+	public static BigDecimal cascadingLCM(BigDecimal n1, BigDecimal n2, BigDecimal oldLCM) {
+	    System.out.println("gcd: " + oldLCM);
 	    
-	    System.out.println(gcd);
-	    
-	    BigDecimal lcm = n1.multiply(n2).divide(gcd);
-	    System.out.println(lcm);
+	    BigDecimal lcm = n1.multiply(n2).divide(oldLCM);
+	    System.out.println("lcm: " + lcm);
 	    System.out.println();
 	    return lcm;
 	}
